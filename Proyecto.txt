@@ -1,0 +1,214 @@
+﻿using System;
+
+class Program
+{
+    static string nombre = "";
+    static char tipoVehiculo = ' ';
+    static int nivelEnergon = 0;
+    static int posicionInicial = 0;
+    static bool modoRobot = false;
+
+    static void Main(string[] args)
+    {
+        Console.WriteLine("¡Bienvenido al mejor simulador para los AutoBots!");
+
+        do
+        {
+            Console.WriteLine("\nMENU PRINCIPAL:");
+            Console.WriteLine("1. Ingresar nombre del AutoBot");
+            Console.WriteLine("2. Ingresar tipo de vehículo (A: auto, C: camión, M: moto)");
+            Console.WriteLine("3. Ingresar nivel de energon (0 - 100%)");
+            Console.WriteLine("4. Ingresar posición inicial (en Km)");
+            Console.WriteLine("5. Menu de Pruebas");
+            Console.WriteLine("6. Salir");
+            Console.Write("\nSeleccione una opción: ");
+
+            string opcion = Console.ReadLine();
+
+            switch (opcion)
+            {
+                case "1":
+                    Console.Clear();
+                    Console.Write("Ingrese el nombre del AutoBot: ");
+                    nombre = Console.ReadLine();
+                    break;
+                case "2":
+                    Console.Clear();
+                    Console.Write("Ingrese el tipo de vehículo (A: auto, C: camión, M: moto): ");
+                    char tipo = Convert.ToChar(Console.ReadLine().ToUpper());
+                    if (tipo == 'A' || tipo == 'C' || tipo == 'M' || tipo == 'R')
+                    {
+                        tipoVehiculo = tipo;
+                        modoRobot = tipoVehiculo == 'R';
+                    }
+                    else
+                    {
+                        Console.WriteLine("Tipo de vehículo inválido.");
+                    }
+                    break;
+                case "3":
+                    Console.Clear();
+                    Console.Write("Ingrese el nivel de energon (0 - 100%): ");
+                    nivelEnergon = Convert.ToInt32(Console.ReadLine());
+                    if (nivelEnergon < 0 || nivelEnergon > 100)
+                    {
+                        Console.WriteLine("Nivel de energon inválido.");
+                    }
+                    break;
+                case "4":
+                    Console.Clear();
+                    bool posicionValida = false;
+                    while (!posicionValida)
+                    {
+                        Console.Write("Ingrese la posición inicial de la base (en Km): ");
+                        if (int.TryParse(Console.ReadLine(), out int posicion))
+                        {
+                            posicionInicial = posicion;
+                            posicionValida = true;
+                        }
+                        else
+                        {
+                            Console.WriteLine("Entrada no válida. Por favor, ingrese un número válido.");
+                        }
+                    }
+                    break;
+                case "5":
+                    Console.Clear();
+                    MostrarOpcionesAdicionales();
+                    break;
+                case "6":
+                    Console.WriteLine("Saliendo del mejor simulador que hay, tenga feliz dia!.");
+                    return;
+                default:
+                    Console.WriteLine("Opción no válida.");
+                    break;
+            }
+
+        } while (true);
+    }
+
+    static void MostrarOpcionesAdicionales()
+    {
+        bool continuar = true;
+
+        while (continuar)
+        {
+            Console.Clear();
+            Console.WriteLine("MENU DEL SIMULADOR:");
+            Console.WriteLine("1. Mostrar información del AutoBot");
+            Console.WriteLine("2. Cargar energon");
+            Console.WriteLine("3. Transformarse");
+            Console.WriteLine("4. Moverse");
+            Console.WriteLine("5. Volver al menú principal");
+            Console.Write("\nSeleccione una opción: ");
+
+            string opcion = Console.ReadLine();
+
+            switch (opcion)
+            {
+                case "1":
+                    Console.Clear();
+                    Console.WriteLine("\nInformación del AutoBot:");
+                    Console.WriteLine("Nombre del AutoBot: " + nombre);
+                    Console.WriteLine("Modo alterno: " + tipoVehiculo);
+                    Console.WriteLine("Estado: " + (modoRobot ? "Modo Robot" : "Modo Vehículo"));
+                    Console.WriteLine("Nivel de energon: " + nivelEnergon + "%");
+                    Console.WriteLine("Posición actual: " + posicionInicial + " Km de la base");
+                    Console.WriteLine("\nPorfavor presione una tecla para poder avanzar.");
+                    Console.ReadKey();
+                    break;
+                case "2":
+                    Console.Clear();
+                    Console.Write("\nIngrese la cantidad de energon a cargar: ");
+                    int cantidadEnergon = Convert.ToInt32(Console.ReadLine());
+                    nivelEnergon += cantidadEnergon;
+                    Console.WriteLine("Nivel actual de energon: " + nivelEnergon + "%");
+                    Console.WriteLine("\nPresione cualquier tecla para avanzar.");
+                    Console.ReadKey();
+                    break;
+                case "3":
+                    Console.Clear();
+                    Console.WriteLine("Transformación en proceso...");
+                    Console.Write("¿Desea cambiar de modo? (S/N): ");
+                    string respuesta = Console.ReadLine().ToUpper();
+                    if (respuesta == "S")
+                    {
+                        modoRobot = !modoRobot;
+                        tipoVehiculo = modoRobot ? 'R' : 'A';
+                    }
+                    Console.WriteLine("Nuevo estado: " + (modoRobot ? "Modo Robot" : "Modo Vehículo"));
+                    Console.WriteLine("\nPresione cualquier tecla para avanazar.");
+                    Console.ReadKey();
+                    break;
+                case "4":
+                    Console.Clear();
+                    Console.WriteLine("Roll Out:");
+                    Console.Write("Ingrese la cantidad de horas que se va a mover: ");
+                    int horasMoverse = Convert.ToInt32(Console.ReadLine());
+                    int kmAvanzadosTotales = 0;
+                    int posicionActual = posicionInicial;
+                    for (int i = 1; i <= horasMoverse; i++)
+                    {
+                        int kmAvanzados = AvancePorHora(tipoVehiculo);
+                        int energiaGastada = GastoEnergonPorHora(tipoVehiculo);
+                        if (energiaGastada > nivelEnergon)
+                        {
+                            Console.WriteLine($"No es posible avanzar {i} horas con el nivel de energon cargado.");
+                            break;
+                        }
+                        nivelEnergon -= energiaGastada;
+                        kmAvanzadosTotales += kmAvanzados;
+                        posicionActual += kmAvanzados;
+                        Console.WriteLine($"Hora {i}: Avanzó {kmAvanzados} Km. Nivel de energon restante: {nivelEnergon}%. Posición actual: {posicionActual} Km de la base");
+                    }
+                    posicionInicial += kmAvanzadosTotales;
+                    Console.WriteLine($"Posición final después de {horasMoverse} horas: {posicionInicial} Km de la base");
+                    Console.WriteLine("\nPresione cualquier tecla para continuar...");
+                    Console.ReadKey();
+                    break;
+                case "5":
+                    continuar = false;
+                    break;
+                default:
+                    Console.WriteLine("\nOpción no válida.");
+                    Console.WriteLine("\nPresione cualquier tecla para regresar.");
+                    Console.ReadKey();
+                    break;
+            }
+        }
+    }
+
+    static int AvancePorHora(char tipoVehiculo)
+    {
+        switch (tipoVehiculo)
+        {
+            case 'A':
+                return 110;
+            case 'C':
+                return 85;
+            case 'M':
+                return 120;
+            case 'R':
+                return 50;
+            default:
+                return 0;
+        }
+    }
+
+    static int GastoEnergonPorHora(char tipoVehiculo)
+    {
+        switch (tipoVehiculo)
+        {
+            case 'A':
+                return 10;
+            case 'C':
+                return 25;
+            case 'M':
+                return 20;
+            case 'R':
+                return 5;
+            default:
+                return 0;
+        }
+    }
+}
